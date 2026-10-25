@@ -6,8 +6,10 @@
 export const BRAND = {
   name: 'PROXVEL',
   tagline: 'Tu próximo destino, recomendado con inteligencia.',
-  // Enlace de descarga del APK beta.
-  betaApkUrl: '/app-release.apk',
+  // El backend redirige al APK de la versión publicada desde el dashboard.
+  betaApkUrl: 'https://proxback-production.up.railway.app/api/v1/releases/latest/download',
+  betaReleaseUrl: 'https://proxback-production.up.railway.app/api/v1/releases/latest?platform=android',
+  legacyApkUrl: '/app-release.apk',
 };
 
 export const NAV = [
@@ -303,7 +305,7 @@ export const FAQS = [
   },
   {
     q: '¿Cómo accedo a la beta ahora mismo?',
-    a: 'Escanea el código QR para descargar el APK de Android, o déjanos tu correo y te enviaremos el enlace de descarga junto con las novedades. La publicación en Google Play llegará pronto.',
+    a: 'Escanea el código QR o pulsa el botón para descargar el APK de Android. La publicación en Google Play llegará pronto.',
   },
   {
     q: '¿Funciona en cualquier teléfono?',

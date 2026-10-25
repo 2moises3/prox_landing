@@ -1,8 +1,10 @@
 import Icon from './Icon';
-import { BRAND } from '../data/content';
+import { QRCodeSVG } from 'qrcode.react';
+import { useApkDownload } from '../hooks/useApkDownload';
 import './BetaAccess.css';
 
 export default function BetaAccess() {
+  const apkUrl = useApkDownload();
   return (
     <section className="beta" id="beta">
       <div className="container beta__container reveal">
@@ -24,10 +26,14 @@ export default function BetaAccess() {
           </ul>
 
           <div className="beta__actions">
-            <a href={BRAND.betaApkUrl} download="PROXVEL-Beta.apk" target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-lg beta__download-btn">
+            <a href={apkUrl} className="btn btn-primary btn-lg beta__download-btn">
               <Icon name="smartphone" size={18} />
-              Descargar Demo
+              Descargar APK
             </a>
+            <div className="beta__qr">
+              <QRCodeSVG value={new URL(apkUrl, window.location.origin).href} size={136} marginSize={1} />
+              <span>Escanea para descargar en Android</span>
+            </div>
             <span className="beta__soon">
               <Icon name="googlePlay" size={18} />
               Próximamente en Google Play

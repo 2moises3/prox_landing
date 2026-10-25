@@ -1,10 +1,12 @@
 import Icon from './Icon';
 import { NAV } from '../data/content';
 import logo from '../assets/logo.png';
+import { useApkDownload } from '../hooks/useApkDownload';
 import './Footer.css';
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const apkUrl = useApkDownload();
 
   return (
     <footer className="footer">
@@ -48,8 +50,8 @@ export default function Footer() {
 
           <div className="footer__nav">
             <span className="footer__nav-title">Beta</span>
-            <a href="/app-release.apk" download="PROXVEL-Beta.apk" target="_blank" rel="noopener noreferrer">Descargar APK</a>
-            <a href="#beta">Recibir por correo</a>
+            <a href={apkUrl}>Descargar APK</a>
+            <a href="#beta">Ver QR de descarga</a>
             <span className="footer__soon">
               <Icon name="googlePlay" size={15} /> Google Play (pronto)
             </span>
