@@ -1,70 +1,85 @@
-import { motion, useMotionTemplate, useScroll, useTransform } from 'framer-motion';
-import Icon from './Icon';
-import MagneticButton from './MagneticButton';
-import logo from '../assets/logo.png';
-import './Hero.css';
+import { useRef } from "react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+import "./Hero.css";
 
 export default function Hero() {
+  const ref = useRef(null);
+  const reduce = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"],
+  });
+  const progress = useSpring(scrollYProgress, { stiffness: 80, damping: 28 });
+  const skyY = useTransform(progress, [0, 1], [0, 55]);
+  const mountainY = useTransform(progress, [0, 1], [0, -28]);
   return (
-    <section className="hero" id="top" aria-label="PROXVEL — inicio">
-      
-      {/* CAPA 1: Cielo (Estático al fondo) */}
+    <section
+      ref={ref}
+      className="mountain-hero"
+      id="top"
+      aria-label="PROXVEL — inicio"
+    >
       <motion.div
-        className="hero__layer hero__layer--sky"
-        initial={{ opacity: 0, scale: 1.05 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+        className="mountain-hero__sky"
+        style={reduce ? {} : { y: skyY }}
         aria-hidden="true"
       />
-
-      {/* CAPA 2: Texto Gigante Intermedio (Amanecer) */}
-      <motion.div 
-        className="hero__layer hero__layer--giant-text"
-        initial={{ opacity: 0, y: '50vh' }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 3, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+      <div className="mountain-hero__title-layer">
+        <motion.h1
+          initial={reduce ? false : { y: "45vh" }}
+          animate={{ y: 0 }}
+          transition={{ duration: 2.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        >
+          PROXVEL
+        </motion.h1>
+      </div>
+      <motion.div
+        className="mountain-hero__foreground"
+        style={reduce ? {} : { y: mountainY }}
         aria-hidden="true"
       >
-        <span className="hero__giant-word">PROXVEL</span>
+        <motion.div
+          className="mountain-hero__mountains"
+          initial={reduce ? false : { y: 55 }}
+          animate={{ y: 0 }}
+          transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+        />
       </motion.div>
-
-      {/* CAPA 3: Montañas en primer plano (PNG transparente) */}
-      <motion.div
-        className="hero__layer hero__layer--mountains"
-        initial={{ y: 80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 1.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        aria-hidden="true"
-      />
-
-      {/* CAPA 4: UI Frontal */}
-      <motion.div
-        className="hero__layer hero__layer--front-ui"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.2, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      <div className="mountain-hero__shade" aria-hidden="true" />
+      <div className="mountain-hero__content">
+        <p>
+          Descubre el Perú con recomendaciones
+          <br className="desktop-break" /> que conectan con tu forma de viajar.
+        </p>
+        <a href="#destinos" className="button mountain-hero__cta">
+          Explorar destinos <span aria-hidden="true">↗</span>
+        </a>
+        <a href="#descargar" className="mountain-hero__download">
+          Descargar para Android <span aria-hidden="true">↓</span>
+        </a>
+      </div>
+      <div
+        className="mountain-hero__strip"
+        aria-label="Factores para elegir tu destino"
       >
-        <div className="hero__content container">
-          <div className="hero__inner">
-            <p className="hero__sub">
-              La primera plataforma de recomendación turística inteligente del Perú.
-            </p>
-
-            <MagneticButton href="#motor" className="btn btn-primary btn-lg hero__cta">
-              Explorar destinos
-              <Icon name="arrowRight" size={18} />
-            </MagneticButton>
-          </div>
-        </div>
-
-        {/* Strip siempre visible (ancla visual) */}
-        <div className="hero__strip" aria-hidden="true">
-          {['Preferencias', 'Seguridad', 'Costo', 'Limpieza', 'Clima', 'Afluencia', 'Afinidad'].map((f) => (
-            <span key={f} className="hero__strip-item">{f}</span>
-          ))}
-        </div>
-      </motion.div>
-
+        {[
+          "Preferencias",
+          "Seguridad",
+          "Costo",
+          "Limpieza",
+          "Clima",
+          "Afluencia",
+          "Afinidad",
+        ].map((f) => (
+          <span key={f}>{f}</span>
+        ))}
+      </div>
     </section>
   );
 }

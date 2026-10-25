@@ -1061,3 +1061,49 @@ p {
     height: 350px;
   }
 }
+/* Give EXPLORA its own visible band above the floating phones. */
+.stage {
+  height: 800px;
+  margin-top: 38px;
+}
+.stage-word {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(72px, 12vw, 150px);
+  line-height: 1;
+  color: #dfe4e6;
+  white-space: nowrap;
+}
+.devices {
+  top: calc(50% + 60px);
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  .stage {
+    height: 650px;
+  }
+  .stage-word {
+    font-size: 13vw;
+  }
+  .devices {
+    top: calc(50% + 45px);
+  }
+}
+@media (max-width: 600px) {
+  .stage {
+    height: 460px;
+    margin-top: 32px;
+  }
+  .stage-word {
+    top: 0;
+    font-size: 14vw;
+  }
+  .devices {
+    top: calc(50% + 32px);
+  }
+}
+@media (max-width: 380px) {
+  .stage {
+    height: 420px;
+  }
+}

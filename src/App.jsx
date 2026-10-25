@@ -9,6 +9,7 @@ import { QRCodeSVG } from "qrcode.react";
 import catalog from "./data/catalog.json";
 import { useApkDownload } from "./hooks/useApkDownload";
 import "./product.css";
+import Hero from "./components/Hero";
 
 const photos = {
   machu_picchu: "machupicchu",
@@ -154,84 +155,26 @@ export default function App() {
         </a>
       </header>
       <main id="contenido">
-        <section className="hero" id="top">
-          <div className="hero-copy">
-            <span className="eyebrow">
-              <span className="live-dot" /> HECHA PARA DESCUBRIR EL PERÚ
-            </span>
-            <h1>
-              Tu próximo destino.
-              <br />
-              <span>Más tú que nunca.</span>
-            </h1>
-            <p>
-              Hay un Perú para cada forma de viajar.
-              <br className="desktop-break" /> Descubre el tuyo con
-              recomendaciones según tus preferencias.
-            </p>
-            <div className="hero-actions">
-              <a className="button button-dark" href={apkUrl}>
-                Descargar para Android <Arrow />
-              </a>
-              <a className="text-link" href="#app">
-                Conoce PROXVEL <span aria-hidden="true">↓</span>
-              </a>
-            </div>
-            <span className="small-note">
-              Beta disponible · Descarga directa del APK
-            </span>
+        <Hero />
+        <div className="catalog-strip">
+          <p>
+            Un buen viaje comienza
+            <br />
+            <strong>con una buena elección.</strong>
+          </p>
+          <div>
+            <strong>{catalog.length}</strong>
+            <span>destinos en el catálogo</span>
           </div>
-          <div className="hero-landscape">
-            <img
-              src="/images/machupicchu.webp"
-              alt="Terrazas de Machu Picchu entre las montañas de Cusco"
-              fetchPriority="high"
-              width="1600"
-              height="900"
-            />
-            <div className="landscape-shade" />
-            <div className="landscape-top">
-              <span>PERÚ, A TU MANERA.</span>
-              <span>13°09′ S · 72°32′ O</span>
-            </div>
-            <div className="landscape-caption">
-              <div>
-                <span>CUSCO, PERÚ</span>
-                <h2>
-                  Hay lugares que
-                  <br />
-                  lo cambian todo.
-                </h2>
-              </div>
-              <a
-                href="#destinos"
-                aria-label="Explorar los destinos"
-                className="round-link"
-              >
-                ↗
-              </a>
-            </div>
+          <div>
+            <strong>{regions}</strong>
+            <span>regiones para explorar</span>
           </div>
-          <div className="catalog-strip">
-            <p>
-              Un buen viaje comienza
-              <br />
-              <strong>con una buena elección.</strong>
-            </p>
-            <div>
-              <strong>{catalog.length}</strong>
-              <span>destinos en el catálogo</span>
-            </div>
-            <div>
-              <strong>{regions}</strong>
-              <span>regiones para explorar</span>
-            </div>
-            <div>
-              <strong>Tu estilo.</strong>
-              <span>El punto de partida</span>
-            </div>
+          <div>
+            <strong>Tu estilo.</strong>
+            <span>El punto de partida</span>
           </div>
-        </section>
+        </div>
         <ProductStage />
         <section className="personalization" id="caracteristicas">
           <div>
