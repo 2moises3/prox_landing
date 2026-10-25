@@ -208,7 +208,7 @@
   font-weight: 700;
 }
 .pin-tooltip {
-  opacity: 0;
+  opacity: 1;
   pointer-events: none;
 }
 .pin-tooltip rect {
@@ -933,3 +933,63 @@
     animation: none !important;
   }
 }
+
+/* One shared map travels from the atlas to the lower-left detail map and back. */
+.atlas-map-canvas > svg,
+.cinema-minimap svg {
+  view-transition-name: atlas-peru-map;
+}
+::view-transition-group(atlas-peru-map) {
+  z-index: 2;
+  animation-duration: 750ms;
+  animation-timing-function: cubic-bezier(.22, 1, .36, 1);
+}
+::view-transition-old(atlas-peru-map),
+::view-transition-new(atlas-peru-map) {
+  height: 100%;
+  width: 100%;
+  object-fit: fill;
+  animation-duration: 750ms;
+}
+::view-transition-group(root) {
+  animation-duration: 450ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+  }
+}
+
+/* Larger galleries stay on one accessible horizontal strip, including on phones. */
+.cinema-gallery {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 5px 2px 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff60 transparent;
+}
+.cinema-gallery > * { flex-shrink: 0; }
+.cinema-video-panel > span { pointer-events: auto; text-align: center; }
+.cinema-video-panel a { color: inherit; text-decoration: underline; }
+.cinema-media-error {
+  position: absolute;
+  bottom: 105px;
+  left: 34%;
+  max-width: 55%;
+  font-size: 12px;
+  color: #fff;
+}
+@media (max-width: 700px) {
+  .cinema-media-error { position: static; max-width: 100%; margin: 20px 0; }
+}
+
+.cinema-video-panel { flex-direction: column; gap: 12px; }
+.cinema-video-panel video {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100% - 32px);
+}
+.cinema-video-panel > span { position: static; flex-shrink: 0; }

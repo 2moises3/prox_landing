@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import SiteHeader from "./components/SiteHeader";
 import catalog from "./data/catalog.json";
@@ -6,6 +7,7 @@ import peru from "./data/peru.json";
 import regions from "./data/peru-regions.json";
 import interests from "./data/atlas-interests.json";
 import media from "./data/atlas-media.json";
+import gallery from "./data/atlas-gallery.json";
 import EcosystemFooter from "./components/EcosystemFooter";
 import { useApkDownload } from "./hooks/useApkDownload";
 
@@ -63,8 +65,15 @@ const destinations = catalog.map((d, i) => ({
     .split(",")
     .map((t) => t.trim())
     .filter(Boolean),
+  video: (gallery[d.destination_id] || []).find((asset) => asset.type === "video") ||
+    (d.destination_id === "machu_picchu" ? {
+      src: "/media/machu-picchu-nando-freitas.mp4",
+      author: "Nando Freitas / Pexels",
+      credit: "https://www.pexels.com/video/breathtaking-views-of-machu-picchu-in-peru-29070674/",
+    } : null),
   images: [
     media[d.destination_id]?.image || d.cover_image_url,
+    ...(gallery[d.destination_id] || []).filter((asset) => asset.type === "image").map((asset) => asset.src),
     ...(local[d.destination_id]
       ? [`/images/${local[d.destination_id]}.webp`]
       : []),
@@ -108,6 +117,8 @@ const fromHash = () =>
     ?.destination_id || null;
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
 const initialView = { x: 0, y: 0, z: 1 };
+// The tip is the geographic anchor; photo and circular head share one center.
+const pinShape = "M0 0C-7-10-26-29-26-38A26 26 0 1 1 26-38C26-29 7-10 0 0Z";
 function Photo({ src, alt = "", ...props }) {
   const [failed, setFailed] = useState(false);
   useEffect(() => setFailed(false), [src]);
@@ -120,6 +131,8 @@ function Photo({ src, alt = "", ...props }) {
 
 function PeruMap({ items, view, setView, onSelect }) {
   const [pinUnit, setPinUnit] = useState(1);
+  const [hovered, setHovered] = useState(null);
+  const [focused, setFocused] = useState(null);
   const svg = useRef(null),
     drag = useRef(null),
     moved = useRef(false);
@@ -164,6 +177,7 @@ function PeruMap({ items, view, setView, onSelect }) {
     if (g) g.items.push(d);
     else groups.push({ x, y, items: [d] });
   }
+  const activeGroup = groups.find((g) => g.items[0].destination_id === (hovered || focused));
   const activate = (g) => {
     if (moved.current) return;
     if (g.items.length === 1) onSelect(g.items[0].destination_id);
@@ -222,7 +236,7 @@ function PeruMap({ items, view, setView, onSelect }) {
         <defs>
           {destinations.map((d) => (
             <clipPath id={`pin-${d.destination_id}`} key={d.destination_id}>
-              <circle cy="-26" r="23" />
+              <circle cy="-38" r="20" />
             </clipPath>
           ))}
         </defs>
@@ -265,7 +279,11 @@ function PeruMap({ items, view, setView, onSelect }) {
                     ? `Acercar ${count} destinos: ${g.items.map((d) => d.name).join(", ")}`
                     : `Explorar ${d.name}`
                 }
-                onClick={() => activate(g)}
+                onPointerEnter={() => setHovered(d.destination_id)}
+                onPointerLeave={() => setHovered(null)}
+                onFocus={() => setFocused(d.destination_id)}
+                onBlur={() => setFocused(null)}
+                onClick={(e) => { e.currentTarget.focus(); activate(g); }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
@@ -277,36 +295,43 @@ function PeruMap({ items, view, setView, onSelect }) {
                 <title>{g.items.map((d) => d.name).join(" · ")}</title>
                 <path
                   className="pin-shell"
-                  d="M0 0C-5-7-27-10-27-28A27 27 0 1 1 27-28C27-10 5-7 0 0Z"
+                  d={pinShape}
                 />
-                <circle cy="-26" r="23" fill="#dedbd5" />
+                <circle cy="-38" r="20" fill="#dedbd5" />
                 <image
                   href={d.pin}
-                  x="-24"
-                  y="-50"
-                  width="48"
-                  height="48"
+                  x="-20"
+                  y="-58"
+                  width="40"
+                  height="40"
                   preserveAspectRatio="xMidYMid slice"
                   clipPath={`url(#pin-${d.destination_id})`}
                 />
                 {count > 1 && (
                   <g className="pin-count">
-                    <circle cx="22" cy="-47" r="12" />
-                    <text x="22" y="-43" textAnchor="middle">
+                    <circle cx="22" cy="-60" r="12" />
+                    <text x="22" y="-56" textAnchor="middle">
                       {count}
                     </text>
                   </g>
                 )}
-                <g className="pin-tooltip">
-                  <rect x="-100" y="-88" width="200" height="27" rx="13" />
-                  <text textAnchor="middle" y="-70">
-                    {count > 1 ? "Acerca para elegir" : d.name}
-                  </text>
-                </g>
               </g>
             );
           })}
         </g>
+        {/* SVG paint order: labels always render after every marker. */}
+        {activeGroup && (() => {
+          const label = activeGroup.items.length > 1 ? "Acerca para elegir" : activeGroup.items[0].name;
+          const width = Math.max(150, label.length * 6.5 + 28) * pinUnit;
+          const x = clamp(activeGroup.x * view.z + view.x, width / 2 + 8, 620 - width / 2 - 8);
+          const y = clamp(activeGroup.y * view.z + view.y - 80 * pinUnit, 32 * pinUnit, 828);
+          return (
+            <g className="pin-tooltip" transform={`translate(${x} ${y})`} aria-hidden="true">
+              <rect x={-width / 2} y={-27 * pinUnit} width={width} height={30 * pinUnit} rx={15 * pinUnit} />
+              <text textAnchor="middle" y={-8 * pinUnit} style={{ fontSize: 11 * pinUnit }}>{label}</text>
+            </g>
+          );
+        })()}
       </svg>
       <span className="map-compass" aria-hidden="true">
         N<br />↑
@@ -381,6 +406,11 @@ function Cinema({ destination: d, onBack }) {
     document.addEventListener("visibilitychange", sync);
     return () => document.removeEventListener("visibilitychange", sync);
   }, [playing, videoMode]);
+  useEffect(() => {
+    if (videoMode && window.matchMedia("(max-width: 700px)").matches) {
+      video.current?.scrollIntoView({ behavior: reduce ? "instant" : "smooth", block: "center" });
+    }
+  }, [videoMode, reduce]);
   const tags = d.tags;
   const profiles = [
     ...(tags.some((t) => ["cultura", "historia", "académico"].includes(t))
@@ -395,7 +425,7 @@ function Cinema({ destination: d, onBack }) {
   return (
     <motion.section
       className={`atlas-cinema ${playing ? "is-playing" : ""}`}
-      initial={{ opacity: 0 }}
+      initial={false}
       animate={{ opacity: 1 }}
       transition={{ duration: reduce ? 0 : 0.7 }}
       aria-label={`Explorando ${d.name}`}
@@ -423,7 +453,7 @@ function Cinema({ destination: d, onBack }) {
         <div className="cinema-video-panel">
           <video
             ref={video}
-            src="/media/machu-picchu-nando-freitas.mp4"
+            src={d.video.src}
             muted
             playsInline
             preload="metadata"
@@ -438,14 +468,14 @@ function Cinema({ destination: d, onBack }) {
               setVideoFailed(true);
             }}
           />
-          <span>Machu Picchu · Nando Freitas / Pexels</span>
+          <span>{d.name} · <a href={d.video.credit} target="_blank" rel="noreferrer">{d.video.author}</a></span>
         </div>
       )}
       <div className="cinema-shade" />
       <button className="cinema-back" onClick={onBack}>
         ← Volver al atlas <span>ESC</span>
       </button>
-      <div className="cinema-copy">
+      <motion.div className="cinema-copy" initial={{ opacity: reduce ? 1 : 0, y: reduce ? 0 : 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduce ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}>
         <span className="eyebrow">{d.region} / PERÚ</span>
         <h1 ref={heading} tabIndex="-1">
           {d.name}
@@ -484,7 +514,7 @@ function Cinema({ destination: d, onBack }) {
         >
           Ver ubicación ↗
         </a>
-      </div>
+      </motion.div>
       <button
         className="cinema-minimap"
         onClick={onBack}
@@ -497,7 +527,7 @@ function Cinema({ destination: d, onBack }) {
           <defs>
             {destinations.map((p) => (
               <clipPath id={`mini-${p.destination_id}`} key={p.destination_id}>
-                <circle r="19" />
+                <circle cy="-38" r="20" />
               </clipPath>
             ))}
           </defs>
@@ -507,9 +537,9 @@ function Cinema({ destination: d, onBack }) {
             const [x, y] = project(p.longitude, p.latitude);
             return (
               <g key={p.destination_id} transform={`translate(${x} ${y})`}>
-                <circle
-                  r="22"
-                  fill="white"
+                <path
+                  d={pinShape}
+                  fill={p.destination_id === d.destination_id ? "#b68c45" : "white"}
                   stroke={
                     p.destination_id === d.destination_id
                       ? "#b68c45"
@@ -519,10 +549,10 @@ function Cinema({ destination: d, onBack }) {
                 />
                 <image
                   href={p.pin}
-                  x="-19"
-                  y="-19"
-                  width="38"
-                  height="38"
+                  x="-20"
+                  y="-58"
+                  width="40"
+                  height="40"
                   preserveAspectRatio="xMidYMid slice"
                   clipPath={`url(#mini-${p.destination_id})`}
                 />
@@ -534,12 +564,13 @@ function Cinema({ destination: d, onBack }) {
           {d.region} · {d.name}
         </small>
       </button>
-      <div className="cinema-gallery">
+      {videoFailed && <p className="cinema-media-error" role="status">No pudimos reproducir el video. Puedes seguir explorando las fotografías.</p>}
+      <div className="cinema-gallery" aria-label={`Galería de ${d.name}`}>
         {available.map((src, i) => (
           <button
             key={src}
             aria-label={`Ver fotografía ${i + 1} de ${d.name}`}
-            aria-pressed={frame % available.length === i}
+            aria-pressed={!videoMode && frame % available.length === i}
             onClick={() => {
               setVideoMode(false);
               setFrame(i);
@@ -549,9 +580,10 @@ function Cinema({ destination: d, onBack }) {
             <Photo src={src} />
           </button>
         ))}
-        {d.destination_id === "machu_picchu" && !videoFailed && (
+        {d.video && !videoFailed && (
           <button
             className="gallery-video"
+            aria-label={`Ver video de ${d.name}`}
             aria-pressed={videoMode}
             onClick={() => {
               setVideoMode(true);
@@ -579,7 +611,7 @@ function Cinema({ destination: d, onBack }) {
           </button>
         )}
         <span>
-          {available.length
+          {videoMode ? "VIDEO" : available.length
             ? `${String((frame % available.length) + 1).padStart(2, "0")} / ${String(available.length).padStart(2, "0")}`
             : "Fotografía no disponible"}
         </span>
@@ -602,28 +634,44 @@ export default function Atlas() {
     [category, setCategory] = useState("Todos"),
     [view, setView] = useState(initialView);
   const returnFocus = useRef(null);
+  const reduce = useReducedMotion();
+  const transition = useRef(null);
+  const changeScene = (id) => {
+    const update = () => {
+      flushSync(() => setSelected(id));
+      if (id) window.scrollTo({ top: 0, behavior: "instant" });
+      else returnFocus.current?.focus({ preventScroll: true });
+    };
+    transition.current?.skipTransition();
+    if (reduce || !document.startViewTransition) {
+      update();
+      return;
+    }
+    const next = document.startViewTransition(update);
+    transition.current = next;
+    // A navigation can interrupt a snapshot; the state update still completes.
+    next.finished.catch(() => {}).finally(() => {
+      if (transition.current === next) transition.current = null;
+    });
+  };
   const select = (id) => {
     returnFocus.current = document.activeElement;
     window.history.pushState(null, "", `#${id}`);
-    setSelected(id);
-    window.scrollTo({ top: 0, behavior: "instant" });
+    changeScene(id);
   };
   const back = () => {
     window.history.replaceState(null, "", window.location.pathname);
-    setSelected(null);
-    requestAnimationFrame(() =>
-      returnFocus.current?.focus({ preventScroll: true }),
-    );
+    changeScene(null);
   };
   useEffect(() => {
-    const change = () => setSelected(fromHash());
+    const change = () => changeScene(fromHash());
     window.addEventListener("popstate", change);
     window.addEventListener("hashchange", change);
     return () => {
       window.removeEventListener("popstate", change);
       window.removeEventListener("hashchange", change);
     };
-  }, []);
+  }, [reduce]);
   useEffect(() => {
     const key = (e) => {
       if (e.key === "Escape" && selected) back();

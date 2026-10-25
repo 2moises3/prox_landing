@@ -1,0 +1,10 @@
+import fs from 'node:fs/promises';
+const gallery = JSON.parse(await fs.readFile('src/data/atlas-gallery.json', 'utf8'));
+const esc = s => String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const entries = Object.entries(gallery).flatMap(([id, items]) => items.map(item => `<article><h3>${esc(item.title)}</h3><p>${esc(item.author)}</p><p>${esc(item.license)} · <a href="${esc(item.licenseUrl || item.credit)}">Licencia</a> · <a href="${esc(item.credit)}">Fuente original</a> · <a href="${esc(item.src)}">Archivo en PROXVEL</a></p><p class="meta">${item.type === 'image' ? 'Adaptación: tamaño y compresión WebP. Se conserva la licencia indicada.' : 'Video original, sin modificaciones.'}</p></article>`));
+const section = `<!-- gallery-start --><section id="galerias"><h2>Galerías adicionales del atlas</h2>${entries.join('\n')}</section><!-- gallery-end -->`;
+let html = await fs.readFile('public/fuentes.html', 'utf8');
+html = html.replace(/<!-- gallery-start -->[\s\S]*?<!-- gallery-end -->/, '');
+html = html.replace('<nav class="docs">', section + '<nav class="docs">');
+await fs.writeFile('public/fuentes.html', html);
+console.log(`${entries.length} créditos de galería actualizados`);
