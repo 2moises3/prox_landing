@@ -11,6 +11,7 @@ import { useApkDownload } from "./hooks/useApkDownload";
 import "./product.css";
 import Hero from "./components/Hero";
 import SiteHeader from "./components/SiteHeader";
+import EcosystemFooter from "./components/EcosystemFooter";
 
 const photos = {
   machu_picchu: "machupicchu",
@@ -338,30 +339,7 @@ export default function App() {
           ))}
         </section>
       </main>
-      <footer className="site-footer">
-        <div className="footer-top">
-          <a className="wordmark" href="#top">
-            PROXVEL
-          </a>
-          <p>
-            Hecho para descubrir el Perú.
-            <br />
-            Equipo M3Biznovatech.
-          </p>
-          <a href="mailto:soporte@m3biznovatech.com">
-            Hablemos <Arrow />
-          </a>
-        </div>
-        <div className="footer-bottom">
-          <span>
-            © {new Date().getFullYear()} Biznovatech S.A.C. (M3Biznovatech)
-          </span>
-          <nav aria-label="Enlaces del pie">
-            <a href="#faq">Preguntas frecuentes</a>
-            <a href="mailto:soporte@m3biznovatech.com">Contacto y privacidad</a>
-          </nav>
-        </div>
-      </footer>
+      <EcosystemFooter />
     </>
   );
 }

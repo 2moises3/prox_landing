@@ -1,0 +1,114 @@
+{
+  "ollantaytambo": {
+    "image": "/media/ollantaytambo.webp",
+    "pin": "/media/ollantaytambo-pin.webp",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/5/57/Ollantaytambo_Archaeological_site_-_terraces.jpg",
+    "credit": "https://commons.wikimedia.org/wiki/File:Ollantaytambo_Archaeological_site_-_terraces.jpg",
+    "originalWidth": 1840,
+    "originalHeight": 1232
+  },
+  "catarata_ahuashiyacu": {
+    "image": "/media/catarata_ahuashiyacu.webp",
+    "pin": "/media/catarata_ahuashiyacu-pin.webp",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Cataras_de_Ahuashiyacu.jpg",
+    "credit": "https://commons.wikimedia.org/wiki/File:Cataras_de_Ahuashiyacu.jpg",
+    "originalWidth": 1840,
+    "originalHeight": 2127
+  },
+  "chan_chan": {
+    "image": "/media/chan_chan.webp",
+    "pin": "/media/chan_chan-pin.webp",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Chan_Chan_02.jpg",
+    "credit": "https://commons.wikimedia.org/wiki/File:Chan_Chan_02.jpg",
+    "originalWidth": 5065,
+    "originalHeight": 3377
+  },
+  "ciudadela_kuelap": {
+    "image": "/media/ciudadela_kuelap.webp",
+    "pin": "/media/ciudadela_kuelap-pin.webp",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/a/a1/Kuelap_P7171324mod.jpg",
+    "credit": "https://commons.wikimedia.org/wiki/File:Kuelap_P7171324mod.jpg",
+    "originalWidth": 2560,
+    "originalHeight": 1560
+  },
+  "huaca_luna": {
+    "image": "/media/huaca_luna.webp",
+    "pin": "/media/huaca_luna-pin.webp",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Huaca_de_la_luna_vue_site.jpg",
+    "credit": "https://commons.wikimedia.org/wiki/File:Huaca_de_la_luna_vue_site.jpg",
+    "originalWidth": 2868,
+    "originalHeight": 1822
+  },
+  "huaca_pucllana": {
+    "image": "/media/huaca_pucllana.webp",
+    "pin": "/media/huaca_pucllana-pin.webp",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/0/06/Huaca_Pucllana-nX-1.jpg",
+    "credit": "https://commons.wikimedia.org/wiki/File:Huaca_Pucllana-nX-1.jpg",
+    "originalWidth": 5472,
+    "originalHeight": 3648
+  },
+  "lineas_nazca": {
+    "image": "/media/lineas_nazca.webp",
+    "pin": "/media/lineas_nazca-pin.webp",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/a/a5/L%C3%ADneas_de_Nazca%2C_Nazca%2C_Per%C3%BA%2C_2015-07-29%2C_DD_52.JPG",
+    "credit": "https://commons.wikimedia.org/wiki/File:L%C3%ADneas_de_Nazca%2C_Nazca%2C_Per%C3%BA%2C_2015-07-29%2C_DD_52.JPG",
+    "originalWidth": 7836,
+    "originalHeight": 4755
+  },
+  "machu_picchu": {
+    "image": "/media/machu_picchu.webp",
+    "pin": "/media/machu_picchu-pin.webp",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/0/02/Machu_Picchu%2C_Per%C3%BA%2C_2015-07-30%2C_DD_60.JPG",
+    "credit": "https://commons.wikimedia.org/wiki/File:Machu_Picchu%2C_Per%C3%BA%2C_2015-07-30%2C_DD_60.JPG",
+    "originalWidth": 5365,
+    "originalHeight": 3590
+  },
+  "museo_sipan": {
+    "image": "/media/museo_sipan.webp",
+    "pin": "/media/museo_sipan-pin.webp",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/c/cf/Tumbas_Reales_Se%C3%B1or_de_Sipan_-_panoramio.jpg",
+    "credit": "https://commons.wikimedia.org/wiki/File:Tumbas_Reales_Se%C3%B1or_de_Sipan_-_panoramio.jpg",
+    "originalWidth": 5312,
+    "originalHeight": 2988
+  },
+  "parque_aguas": {
+    "image": "/media/parque_aguas.webp",
+    "pin": "/media/parque_aguas-pin.webp",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/e/e1/El_Circuito_M%C3%A1gico_del_Agua_del_Parque_de_la_Reserva_01.jpg",
+    "credit": "https://commons.wikimedia.org/wiki/File:El_Circuito_M%C3%A1gico_del_Agua_del_Parque_de_la_Reserva_01.jpg",
+    "originalWidth": 3600,
+    "originalHeight": 2392
+  },
+  "parque_huascaran": {
+    "image": "/media/parque_huascaran.webp",
+    "pin": "/media/parque_huascaran-pin.webp",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/6/62/Huascar%C3%A1n_en_laguna_Chinancocha_Llanganuco.jpg",
+    "credit": "https://commons.wikimedia.org/wiki/File:Huascar%C3%A1n_en_laguna_Chinancocha_Llanganuco.jpg",
+    "originalWidth": 4000,
+    "originalHeight": 2252
+  },
+  "reserva_paracas": {
+    "image": "/media/reserva_paracas.webp",
+    "pin": "/media/reserva_paracas-pin.webp",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/c/c6/Paracas_National_Reserve.jpg",
+    "credit": "https://commons.wikimedia.org/wiki/File:Paracas_National_Reserve.jpg",
+    "originalWidth": 3802,
+    "originalHeight": 2139
+  },
+  "valle_colca": {
+    "image": "/media/valle_colca.webp",
+    "pin": "/media/valle_colca-pin.webp",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Valle_del_Colca%2C_Per%C3%BA%2C_2015-08-02%2C_DD_64.JPG",
+    "credit": "https://commons.wikimedia.org/wiki/File:Valle_del_Colca%2C_Per%C3%BA%2C_2015-08-02%2C_DD_64.JPG",
+    "originalWidth": 8050,
+    "originalHeight": 4009
+  },
+  "ventanillas_otuzco": {
+    "image": "/media/ventanillas_otuzco.webp",
+    "pin": "/media/ventanillas_otuzco-pin.webp",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Ventanas_de_Otuzco.jpg",
+    "credit": "https://commons.wikimedia.org/wiki/File:Ventanas_de_Otuzco.jpg",
+    "originalWidth": 5184,
+    "originalHeight": 3456
+  }
+}

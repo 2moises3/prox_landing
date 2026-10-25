@@ -1147,3 +1147,65 @@ p {
 .catalog-toggle {
   width: fit-content;
 }
+/* Shared ecosystem navigation, including a readable active state on imagery. */
+.site-header nav a[aria-current="page"] {
+  color: var(--ink);
+  box-shadow: 0 2px currentColor;
+  padding-bottom: 5px;
+  font-weight: 650;
+}
+.site-header--clear nav a[aria-current="page"],
+.is-cinematic .site-header nav a[aria-current="page"] {
+  color: #fff;
+  box-shadow: 0 2px #fff;
+  text-shadow: 0 1px 10px #0008;
+}
+.footer-bottom nav {
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.footer-top p a,
+.footer-bottom > span a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 700px) {
+  .site-header {
+    height: 108px;
+    flex-wrap: wrap;
+    padding: 12px 5%;
+    gap: 10px;
+  }
+  .site-header .wordmark {
+    font-size: 17px;
+  }
+  .site-header nav {
+    display: flex !important;
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    gap: 28px;
+  }
+  .site-header nav a {
+    font-size: 11px;
+  }
+  .site-header .nav-download {
+    font-size: 11px;
+    padding: 9px 14px;
+  }
+  .site-header--overlay {
+    height: 108px;
+  }
+  .is-cinematic .site-header {
+    height: 108px;
+  }
+  .is-cinematic .cinema-back {
+    top: 125px;
+  }
+  .footer-bottom nav {
+    line-height: 1.8;
+  }
+  .footer-bottom {
+    gap: 20px;
+  }
+}

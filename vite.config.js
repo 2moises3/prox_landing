@@ -6,7 +6,11 @@ export default defineConfig({
   plugins: [react()],
   build: {
     rollupOptions: {
-      input: { main: resolve("index.html"), atlas: resolve("atlas.html") },
+      input: {
+        main: resolve("index.html"),
+        atlas: resolve("atlas.html"),
+        app: resolve("app.html"),
+      },
     },
   },
   resolve: {

@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-export default function SiteHeader({ home = false }) {
+export default function SiteHeader({
+  home = false,
+  page = home ? "home" : "atlas",
+}) {
   const [overHero, setOverHero] = useState(home);
   useEffect(() => {
     if (!home) return;
@@ -25,11 +28,18 @@ export default function SiteHeader({ home = false }) {
         PROXVEL<span className="beta-label">BETA</span>
       </a>
       <nav aria-label="Principal">
-        <a href={home ? "#app" : "/#app"}>La app</a>
-        <a href="/atlas.html" aria-current={home ? undefined : "page"}>
+        <a href="/" aria-current={page === "home" ? "page" : undefined}>
+          Home
+        </a>
+        <a
+          href="/atlas.html"
+          aria-current={page === "atlas" ? "page" : undefined}
+        >
           Atlas de destinos
         </a>
-        <a href={home ? "#como-funciona" : "/#como-funciona"}>Cómo funciona</a>
+        <a href="/app.html" aria-current={page === "app" ? "page" : undefined}>
+          La app
+        </a>
       </nav>
       <a className="nav-download" href={home ? "#descargar" : "/#descargar"}>
         Descargar <span aria-hidden="true">↗</span>

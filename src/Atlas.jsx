@@ -1,26 +1,31 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import SiteHeader from "./components/SiteHeader";
 import catalog from "./data/catalog.json";
 import peru from "./data/peru.json";
+import regions from "./data/peru-regions.json";
+import interests from "./data/atlas-interests.json";
+import media from "./data/atlas-media.json";
+import EcosystemFooter from "./components/EcosystemFooter";
 import { useApkDownload } from "./hooks/useApkDownload";
 
-const names = {
-  ollantaytambo: "Ollantaytambo",
-  catarata_ahuashiyacu: "Ahuashiyacu",
-  chan_chan: "Chan Chan",
-  ciudadela_kuelap: "Kuélap",
-  huaca_luna: "Huaca de la Luna",
-  huaca_pucllana: "Huaca Pucllana",
-  lineas_nazca: "Líneas de Nasca",
-  machu_picchu: "Machu Picchu",
-  museo_sipan: "Tumbas Reales de Sipán",
-  parque_aguas: "Circuito Mágico del Agua",
-  parque_huascaran: "Huascarán",
-  reserva_paracas: "Paracas",
-  valle_colca: "Valle del Colca",
-  ventanillas_otuzco: "Otuzco",
-};
-const photos = {
+const names = [
+  "Ollantaytambo",
+  "Ahuashiyacu",
+  "Chan Chan",
+  "Kuélap",
+  "Huaca de la Luna",
+  "Huaca Pucllana",
+  "Líneas de Nasca",
+  "Machu Picchu",
+  "Tumbas Reales de Sipán",
+  "Circuito Mágico del Agua",
+  "Huascarán",
+  "Paracas",
+  "Valle del Colca",
+  "Ventanillas de Otuzco",
+];
+const local = {
   machu_picchu: "machupicchu",
   reserva_paracas: "paracas",
   valle_colca: "colca",
@@ -29,9 +34,43 @@ const photos = {
   museo_sipan: "sipan",
   lineas_nazca: "nasca",
   parque_aguas: "circuito-magico",
-  catarata_ahuashiyacu: "Viagens Catarata",
 };
-const project = (lon, lat) => [170 + (lon + 82) * 34, 45 - lat * 34];
+const descriptions = [
+  "Terrazas de piedra y arquitectura inca en el Valle Sagrado. Una invitación a observar el paisaje a través de su historia.",
+  "El agua y la vegetación protagonizan esta escapada cerca de Tarapoto. Un encuentro con la naturaleza de San Martín.",
+  "Muros de adobe, relieves y espacios abiertos para acercarte al legado de la cultura Chimú.",
+  "Arquitectura de piedra en las alturas de Amazonas. Descubre una de las expresiones del legado Chachapoya.",
+  "Una mirada al mundo Moche a través de su arquitectura ceremonial y sus relieves.",
+  "Un encuentro con la historia prehispánica en medio de Miraflores. Otra manera de explorar Lima.",
+  "Trazos sobre el desierto que invitan a descubrir el patrimonio de Nasca y Palpa.",
+  "Terrazas, caminos y arquitectura inca entre montañas. Un paisaje donde naturaleza e historia se encuentran.",
+  "Un recorrido por el legado de Sipán y la cultura Moche, en Lambayeque.",
+  "Agua y luz para descubrir otra faceta de Lima. Una experiencia urbana en el Parque de la Reserva.",
+  "Montañas y paisajes altoandinos de Áncash. Una invitación a conocer la naturaleza de la Cordillera Blanca.",
+  "El desierto se encuentra con el océano en la costa de Ica. Paisajes para mirar el Perú desde otra perspectiva.",
+  "Un valle de paisajes andinos en Arequipa. Territorio, naturaleza y vida local para explorar con calma.",
+  "Nichos tallados en roca que acercan al patrimonio funerario prehispánico de Cajamarca.",
+];
+const destinations = catalog.map((d, i) => ({
+  ...d,
+  name: names[i],
+  description: descriptions[i],
+  pin: media[d.destination_id]?.pin || d.cover_image_url,
+  tags: (
+    interests.find((r) => r.destination_id === d.destination_id)?.intereses ||
+    ""
+  )
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean),
+  images: [
+    media[d.destination_id]?.image || d.cover_image_url,
+    ...(local[d.destination_id]
+      ? [`/images/${local[d.destination_id]}.webp`]
+      : []),
+  ].filter(Boolean),
+}));
+const project = (lon, lat) => [65 + (lon + 82) * 43, 30 - lat * 43];
 const rings =
   peru.type === "Polygon" ? peru.coordinates : peru.coordinates.flat();
 const outline = rings
@@ -39,130 +78,594 @@ const outline = rings
     (r) =>
       r
         .map(
-          ([lon, lat], i) =>
-            `${i ? "L" : "M"}${project(lon, lat)
-              .map((v) => v.toFixed(2))
-              .join(",")}`,
+          ([lon, lat], i) => `${i ? "L" : "M"}${project(lon, lat).join(",")}`,
         )
         .join(" ") + "Z",
   )
   .join(" ");
-const ordered = [...catalog].sort((a, b) => b.latitude - a.latitude);
-const left = ordered.filter((d) => d.longitude < -76.5);
-const right = ordered.filter((d) => d.longitude >= -76.5);
+const boundaries = regions
+  .map((g) =>
+    (g.type === "Polygon" ? g.coordinates : g.coordinates.flat())
+      .map(
+        (r) =>
+          r
+            .map(
+              ([lon, lat], i) =>
+                `${i ? "L" : "M"}${project(lon, lat).join(",")}`,
+            )
+            .join(" ") + "Z",
+      )
+      .join(" "),
+  )
+  .join(" ");
 const normalize = (s) =>
   s
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
-const initialId = () =>
-  catalog.find((d) => d.destination_id === window.location.hash.slice(1))
-    ?.destination_id || "machu_picchu";
-function DestinationPhoto({ destination }) {
+const fromHash = () =>
+  destinations.find((d) => d.destination_id === window.location.hash.slice(1))
+    ?.destination_id || null;
+const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+const initialView = { x: 0, y: 0, z: 1 };
+function Photo({ src, alt = "", ...props }) {
   const [failed, setFailed] = useState(false);
-  const local = photos[destination.destination_id];
+  useEffect(() => setFailed(false), [src]);
+  return failed ? (
+    <span className="photo-unavailable">{alt || "PROXVEL"}</span>
+  ) : (
+    <img src={src} alt={alt} onError={() => setFailed(true)} {...props} />
+  );
+}
+
+function PeruMap({ items, view, setView, onSelect }) {
+  const [pinUnit, setPinUnit] = useState(1);
+  const svg = useRef(null),
+    drag = useRef(null),
+    moved = useRef(false);
+  const point = (event) => {
+    const p = new DOMPoint(event.clientX, event.clientY);
+    return p.matrixTransform(svg.current.getScreenCTM().inverse());
+  };
+  useEffect(() => {
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      if (width && height)
+        setPinUnit(0.9 / Math.min(width / 620, height / 860));
+    });
+    observer.observe(svg.current);
+    return () => observer.disconnect();
+  }, []);
+  const zoomAt = (amount, p = { x: 310, y: 430 }) =>
+    setView((v) => {
+      const z = clamp(v.z * amount, 1, 96);
+      return {
+        z,
+        x: p.x - ((p.x - v.x) * z) / v.z,
+        y: p.y - ((p.y - v.y) * z) / v.z,
+      };
+    });
+  useEffect(() => {
+    const el = svg.current;
+    const wheel = (e) => {
+      e.preventDefault();
+      zoomAt(Math.exp(-e.deltaY * 0.002), point(e));
+    };
+    el.addEventListener("wheel", wheel, { passive: false });
+    return () => el.removeEventListener("wheel", wheel);
+  }, []);
+  // Nearby destinations remain geographically anchored; clusters zoom into their true coordinates.
+  const groups = [];
+  for (const d of items) {
+    const [x, y] = project(d.longitude, d.latitude);
+    const g = groups.find(
+      (g) => Math.hypot(g.x - x, g.y - y) * view.z < 49 * pinUnit,
+    );
+    if (g) g.items.push(d);
+    else groups.push({ x, y, items: [d] });
+  }
+  const activate = (g) => {
+    if (moved.current) return;
+    if (g.items.length === 1) onSelect(g.items[0].destination_id);
+    else {
+      const points = g.items.map((d) => project(d.longitude, d.latitude));
+      const distance = Math.min(
+        ...points.flatMap((p, i) =>
+          points.slice(i + 1).map((q) => Math.hypot(p[0] - q[0], p[1] - q[1])),
+        ),
+      );
+      const z = Math.min(
+        96,
+        Math.max(view.z * 2, (65 * pinUnit) / Math.max(distance, 1)),
+      );
+      const cx = points.reduce((n, p) => n + p[0], 0) / points.length,
+        cy = points.reduce((n, p) => n + p[1], 0) / points.length;
+      setView({ z, x: 310 - cx * z, y: 430 - cy * z });
+    }
+  };
   return (
-    <div className={`atlas-photo ${failed ? "atlas-photo--empty" : ""}`}>
-      {!failed && (
-        <img
-          src={local ? `/images/${local}.webp` : destination.cover_image_url}
-          alt={destination.destination}
-          onError={() => setFailed(true)}
-          width="600"
-          height="400"
-        />
-      )}
-      {failed && (
-        <span>
-          PERÚ
-          <br />
-          <small>{destination.region}</small>
-        </span>
-      )}
-      <span className="atlas-photo-tag">{destination.category}</span>
+    <div className="atlas-map-canvas">
+      <svg
+        ref={svg}
+        viewBox="0 0 620 860"
+        role="group"
+        aria-label="Mapa interactivo del Perú"
+        onPointerDown={(e) => {
+          if (e.button !== 0) return;
+          moved.current = false;
+          if (e.target.closest(".photo-pin")) return;
+          drag.current = { p: point(e), v: view };
+          e.currentTarget.setPointerCapture(e.pointerId);
+        }}
+        onPointerMove={(e) => {
+          if (!drag.current) return;
+          const p = point(e),
+            dx = p.x - drag.current.p.x,
+            dy = p.y - drag.current.p.y;
+          if (Math.hypot(dx, dy) > 4) moved.current = true;
+          if (moved.current)
+            setView({
+              ...drag.current.v,
+              x: drag.current.v.x + dx,
+              y: drag.current.v.y + dy,
+            });
+        }}
+        onPointerUp={(e) => {
+          drag.current = null;
+          if (e.currentTarget.hasPointerCapture(e.pointerId))
+            e.currentTarget.releasePointerCapture(e.pointerId);
+        }}
+        onPointerCancel={() => {
+          drag.current = null;
+        }}
+      >
+        <defs>
+          {destinations.map((d) => (
+            <clipPath id={`pin-${d.destination_id}`} key={d.destination_id}>
+              <circle cy="-26" r="23" />
+            </clipPath>
+          ))}
+        </defs>
+        <g transform={`translate(${view.x} ${view.y}) scale(${view.z})`}>
+          <path
+            className="peru-outline"
+            d={outline}
+            vectorEffect="non-scaling-stroke"
+          />
+          <path
+            d={boundaries}
+            fill="none"
+            stroke="#999e9f"
+            strokeWidth=".45"
+            vectorEffect="non-scaling-stroke"
+          />
+          <text x="355" y="350" className="map-peru">
+            P E R Ú
+          </text>
+          <text
+            x="64"
+            y="570"
+            transform="rotate(-64 64 570)"
+            className="map-ocean"
+          >
+            OCÉANO PACÍFICO
+          </text>
+          {groups.map((g) => {
+            const d = g.items[0],
+              count = g.items.length;
+            return (
+              <g
+                key={d.destination_id}
+                transform={`translate(${g.x} ${g.y}) scale(${pinUnit / view.z})`}
+                className="photo-pin"
+                role="button"
+                tabIndex="0"
+                aria-label={
+                  count > 1
+                    ? `Acercar ${count} destinos: ${g.items.map((d) => d.name).join(", ")}`
+                    : `Explorar ${d.name}`
+                }
+                onClick={() => activate(g)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    moved.current = false;
+                    activate(g);
+                  }
+                }}
+              >
+                <title>{g.items.map((d) => d.name).join(" · ")}</title>
+                <path
+                  className="pin-shell"
+                  d="M0 0C-5-7-27-10-27-28A27 27 0 1 1 27-28C27-10 5-7 0 0Z"
+                />
+                <circle cy="-26" r="23" fill="#dedbd5" />
+                <image
+                  href={d.pin}
+                  x="-24"
+                  y="-50"
+                  width="48"
+                  height="48"
+                  preserveAspectRatio="xMidYMid slice"
+                  clipPath={`url(#pin-${d.destination_id})`}
+                />
+                {count > 1 && (
+                  <g className="pin-count">
+                    <circle cx="22" cy="-47" r="12" />
+                    <text x="22" y="-43" textAnchor="middle">
+                      {count}
+                    </text>
+                  </g>
+                )}
+                <g className="pin-tooltip">
+                  <rect x="-100" y="-88" width="200" height="27" rx="13" />
+                  <text textAnchor="middle" y="-70">
+                    {count > 1 ? "Acerca para elegir" : d.name}
+                  </text>
+                </g>
+              </g>
+            );
+          })}
+        </g>
+      </svg>
+      <span className="map-compass" aria-hidden="true">
+        N<br />↑
+      </span>
+      <div className="atlas-zoom">
+        <button
+          onClick={() => zoomAt(1.6)}
+          disabled={view.z >= 96}
+          aria-label="Acercar mapa"
+        >
+          +
+        </button>
+        <button
+          onClick={() => zoomAt(1 / 1.6)}
+          disabled={view.z <= 1}
+          aria-label="Alejar mapa"
+        >
+          −
+        </button>
+        <button
+          onClick={() => setView(initialView)}
+          aria-label="Ver todo el Perú"
+        >
+          ⤢
+        </button>
+      </div>
+      <span className="map-zoom-level" aria-live="polite">
+        {Math.round(view.z * 100)}%
+      </span>
     </div>
   );
 }
-export default function Atlas() {
-  const [selected, setSelected] = useState(initialId);
-  const [query, setQuery] = useState("");
-  const [zoom, setZoom] = useState(1);
-  const [category, setCategory] = useState("Todos");
-  const apk = useApkDownload();
+
+function Cinema({ destination: d, onBack }) {
+  const reduce = useReducedMotion(),
+    [frame, setFrame] = useState(0),
+    [playing, setPlaying] = useState(!reduce),
+    [available, setAvailable] = useState(d.images);
+  const [videoMode, setVideoMode] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
+  const video = useRef(null);
+  const [loaded, setLoaded] = useState([]);
+  const heading = useRef(null),
+    apk = useApkDownload();
   useEffect(() => {
-    const change = () => setSelected(initialId());
-    window.addEventListener("hashchange", change);
-    return () => window.removeEventListener("hashchange", change);
+    heading.current?.focus({ preventScroll: true });
   }, []);
-  const filtered = useMemo(
-    () =>
-      catalog.filter(
-        (d) =>
-          (category === "Todos" || d.category === category) &&
-          normalize(`${d.destination} ${d.city} ${d.region}`).includes(
-            normalize(query),
-          ),
-      ),
-    [query, category],
-  );
+  useEffect(() => {
+    if (reduce) setPlaying(false);
+  }, [reduce]);
   useEffect(() => {
     if (
-      filtered.length &&
-      !filtered.some((d) => d.destination_id === selected)
-    ) {
-      setSelected(filtered[0].destination_id);
-      window.history.replaceState(null, "", `#${filtered[0].destination_id}`);
-    }
-  }, [filtered, selected]);
-  const visible = new Set(filtered.map((d) => d.destination_id));
-  const destination = catalog.find((d) => d.destination_id === selected);
-  const select = (id) => {
-    setSelected(id);
-    window.history.replaceState(null, "", `#${id}`);
-  };
-  const coord = (n, negative, positive) =>
-    `${Math.abs(n).toFixed(4)}° ${n < 0 ? negative : positive}`;
+      !playing ||
+      videoMode ||
+      available.length < 2 ||
+      loaded.length < available.length
+    )
+      return;
+    const timer = setInterval(() => {
+      if (!document.hidden) setFrame((f) => (f + 1) % available.length);
+    }, 7500);
+    return () => clearInterval(timer);
+  }, [playing, videoMode, available.length, loaded.length]);
+  useEffect(() => {
+    const el = video.current;
+    if (!el || !videoMode) return;
+    const sync = () => {
+      if (playing && !document.hidden) el.play().catch(() => setPlaying(false));
+      else el.pause();
+    };
+    sync();
+    document.addEventListener("visibilitychange", sync);
+    return () => document.removeEventListener("visibilitychange", sync);
+  }, [playing, videoMode]);
+  const tags = d.tags;
+  const profiles = [
+    ...(tags.some((t) => ["cultura", "historia", "académico"].includes(t))
+      ? ["Cultural"]
+      : []),
+    ...(tags.includes("naturaleza") ? ["Naturalista"] : []),
+    ...(tags.includes("aventura") ? ["Aventurero"] : []),
+    ...(tags.includes("urbano") ? ["Urbano recreativo"] : []),
+    ...(tags.includes("familiar") ? ["Familiar"] : []),
+    ...(tags.includes("gastronomía") ? ["Gastronómico"] : []),
+  ];
   return (
-    <>
-      <a className="skip-link" href="#atlas">
-        Saltar al atlas
-      </a>
-      <SiteHeader />
-      <main className="atlas-page" id="atlas">
-        <div className="atlas-intro">
+    <motion.section
+      className={`atlas-cinema ${playing ? "is-playing" : ""}`}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: reduce ? 0 : 0.7 }}
+      aria-label={`Explorando ${d.name}`}
+    >
+      <div className="cinema-background" aria-hidden="true">
+        {available.map((src, i) => (
+          <img
+            key={src}
+            className={frame % available.length === i ? "active" : ""}
+            src={src}
+            alt=""
+            onLoad={() =>
+              setLoaded((previous) =>
+                previous.includes(src) ? previous : [...previous, src],
+              )
+            }
+            onError={() => {
+              setAvailable((a) => a.filter((s) => s !== src));
+              setFrame(0);
+            }}
+          />
+        ))}
+      </div>
+      {videoMode && (
+        <div className="cinema-video-panel">
+          <video
+            ref={video}
+            src="/media/machu-picchu-nando-freitas.mp4"
+            muted
+            playsInline
+            preload="metadata"
+            controls
+            onPlay={() => setPlaying(true)}
+            onPause={() => setPlaying(false)}
+            onEnded={() => {
+              setPlaying(false);
+            }}
+            onError={() => {
+              setVideoMode(false);
+              setVideoFailed(true);
+            }}
+          />
+          <span>Machu Picchu · Nando Freitas / Pexels</span>
+        </div>
+      )}
+      <div className="cinema-shade" />
+      <button className="cinema-back" onClick={onBack}>
+        ← Volver al atlas <span>ESC</span>
+      </button>
+      <div className="cinema-copy">
+        <span className="eyebrow">{d.region} / PERÚ</span>
+        <h1 ref={heading} tabIndex="-1">
+          {d.name}
+        </h1>
+        <p className="cinema-description">{d.description}</p>
+        <div className="cinema-interests">
+          <span className="eyebrow">UNA EXPERIENCIA DE</span>
           <div>
-            <a className="atlas-back" href="/">
-              ← Volver a PROXVEL
-            </a>
-            <span className="eyebrow">EL PERÚ, PUNTO POR PUNTO</span>
-            <h1>
-              Un mapa.
-              <br />
-              <span>Muchas próximas historias.</span>
-            </h1>
-          </div>
-          <div className="atlas-intro-note">
-            <span className="atlas-count">
-              14<span> / DESTINOS</span>
-            </span>
-            <p>
-              Una selección de lugares para empezar a explorar. Elige un punto y
-              descubre dónde comienza tu próxima escapada.
-            </p>
+            {tags.map((t) => (
+              <span key={t}>{t}</span>
+            ))}
           </div>
         </div>
-        <div className="atlas-controls">
+        {profiles.length > 0 && (
+          <div className="cinema-profiles">
+            <span>Para viajeros con espíritu</span>
+            <strong>{profiles.join(" · ")}</strong>
+            <small>
+              Orientación por intereses del catálogo. Tu afinidad personalizada
+              se calcula en la app.
+            </small>
+          </div>
+        )}
+        <div className="cinema-facts">
+          <span>{d.category}</span>
+          <span>Costo orientativo: {d.cost_level}</span>
+        </div>
+        <a className="cinema-download" href={apk}>
+          Descargar PROXVEL <span>↗</span>
+        </a>
+        <a
+          className="cinema-location"
+          href={`https://www.google.com/maps/search/?api=1&query=${d.latitude},${d.longitude}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Ver ubicación ↗
+        </a>
+      </div>
+      <button
+        className="cinema-minimap"
+        onClick={onBack}
+        aria-label="Ampliar mapa y elegir otro destino"
+      >
+        <span>
+          ← VOLVER AL ATLAS <b>⤢</b>
+        </span>
+        <svg viewBox="0 0 620 860" aria-hidden="true">
+          <defs>
+            {destinations.map((p) => (
+              <clipPath id={`mini-${p.destination_id}`} key={p.destination_id}>
+                <circle r="19" />
+              </clipPath>
+            ))}
+          </defs>
+          <path d={outline} fill="none" stroke="currentColor" strokeWidth="2" />
+          <path d={boundaries} fill="none" stroke="#9a9e9e" strokeWidth=".8" />
+          {destinations.map((p) => {
+            const [x, y] = project(p.longitude, p.latitude);
+            return (
+              <g key={p.destination_id} transform={`translate(${x} ${y})`}>
+                <circle
+                  r="22"
+                  fill="white"
+                  stroke={
+                    p.destination_id === d.destination_id
+                      ? "#b68c45"
+                      : "#bdc0bd"
+                  }
+                  strokeWidth={p.destination_id === d.destination_id ? 7 : 2}
+                />
+                <image
+                  href={p.pin}
+                  x="-19"
+                  y="-19"
+                  width="38"
+                  height="38"
+                  preserveAspectRatio="xMidYMid slice"
+                  clipPath={`url(#mini-${p.destination_id})`}
+                />
+              </g>
+            );
+          })}
+        </svg>
+        <small>
+          {d.region} · {d.name}
+        </small>
+      </button>
+      <div className="cinema-gallery">
+        {available.map((src, i) => (
+          <button
+            key={src}
+            aria-label={`Ver fotografía ${i + 1} de ${d.name}`}
+            aria-pressed={frame % available.length === i}
+            onClick={() => {
+              setVideoMode(false);
+              setFrame(i);
+              setPlaying(false);
+            }}
+          >
+            <Photo src={src} />
+          </button>
+        ))}
+        {d.destination_id === "machu_picchu" && !videoFailed && (
+          <button
+            className="gallery-video"
+            aria-pressed={videoMode}
+            onClick={() => {
+              setVideoMode(true);
+              setPlaying(true);
+            }}
+          >
+            ▷ Video
+          </button>
+        )}
+        {available.length > 0 && (
+          <button
+            className="gallery-pause"
+            onClick={() => setPlaying((p) => !p)}
+            aria-label={
+              videoMode
+                ? playing
+                  ? "Pausar video"
+                  : "Reproducir video"
+                : playing
+                  ? "Pausar movimiento y fotografías"
+                  : "Reproducir movimiento y fotografías"
+            }
+          >
+            {playing ? "Ⅱ" : "▷"}
+          </button>
+        )}
+        <span>
+          {available.length
+            ? `${String((frame % available.length) + 1).padStart(2, "0")} / ${String(available.length).padStart(2, "0")}`
+            : "Fotografía no disponible"}
+        </span>
+      </div>
+      <a
+        className="cinema-source"
+        href="/fuentes.html"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Fotografías y créditos ↗
+      </a>
+    </motion.section>
+  );
+}
+
+export default function Atlas() {
+  const [selected, setSelected] = useState(fromHash),
+    [query, setQuery] = useState(""),
+    [category, setCategory] = useState("Todos"),
+    [view, setView] = useState(initialView);
+  const returnFocus = useRef(null);
+  const select = (id) => {
+    returnFocus.current = document.activeElement;
+    window.history.pushState(null, "", `#${id}`);
+    setSelected(id);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  };
+  const back = () => {
+    window.history.replaceState(null, "", window.location.pathname);
+    setSelected(null);
+    requestAnimationFrame(() =>
+      returnFocus.current?.focus({ preventScroll: true }),
+    );
+  };
+  useEffect(() => {
+    const change = () => setSelected(fromHash());
+    window.addEventListener("popstate", change);
+    window.addEventListener("hashchange", change);
+    return () => {
+      window.removeEventListener("popstate", change);
+      window.removeEventListener("hashchange", change);
+    };
+  }, []);
+  useEffect(() => {
+    const key = (e) => {
+      if (e.key === "Escape" && selected) back();
+    };
+    window.addEventListener("keydown", key);
+    return () => window.removeEventListener("keydown", key);
+  }, [selected]);
+  const filtered = destinations.filter(
+    (d) =>
+      (category === "Todos" || category === d.category) &&
+      normalize(`${d.name} ${d.region} ${d.city}`).includes(normalize(query)),
+  );
+  return (
+    <div className={`atlas-experience ${selected ? "is-cinematic" : ""}`}>
+      <SiteHeader />
+      <main className="atlas-overview" hidden={!!selected}>
+        <section className="atlas-editorial">
+          <a className="atlas-home" href="/">
+            ← PROXVEL
+          </a>
+          <span className="eyebrow">EL PERÚ, PUNTO POR PUNTO</span>
+          <h1>
+            Perú, por
+            <br />
+            <em>descubrir.</em>
+          </h1>
+          <p>
+            14 destinos. Muchas formas de viajar.
+            <br />
+            Elige dónde empieza tu próxima historia.
+          </p>
           <label className="atlas-search">
             <span aria-hidden="true">⌕</span>
             <input
+              type="search"
+              placeholder="Destino, ciudad o región"
               aria-label="Buscar destino, ciudad o región"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Busca un destino, ciudad o región"
-              type="search"
             />
           </label>
-          <div className="atlas-categories" aria-label="Filtrar por categoría">
+          <div className="atlas-filters" aria-label="Categorías">
             {["Todos", ...new Set(catalog.map((d) => d.category))].map((c) => (
               <button
                 key={c}
@@ -173,296 +676,67 @@ export default function Atlas() {
               </button>
             ))}
           </div>
-        </div>
-        <div className="atlas-workspace">
-          <section
-            className="atlas-map-panel"
-            aria-label="Mapa de destinos del Perú"
-          >
-            <div className="atlas-map-top">
-              <span>PERÚ / ATLAS DE DESTINOS</span>
-              <span aria-live="polite">
-                {filtered.length} de {catalog.length} lugares
-              </span>
-            </div>
-            <div className="map-tools">
-              <span>Amplía el mapa para leer las etiquetas.</span>
-              <div>
-                <button
-                  aria-label="Alejar mapa"
-                  disabled={zoom <= 1}
-                  onClick={() => setZoom((z) => Math.max(1, z - 0.5))}
-                >
-                  −
-                </button>
-                <span aria-live="polite">{Math.round(zoom * 100)}%</span>
-                <button
-                  aria-label="Acercar mapa"
-                  disabled={zoom >= 2.5}
-                  onClick={() => setZoom((z) => Math.min(2.5, z + 0.5))}
-                >
-                  +
-                </button>
-                <button
-                  aria-label="Restablecer mapa"
-                  onClick={() => setZoom(1)}
-                >
-                  ↺
-                </button>
-              </div>
-            </div>
-            <div
-              className="atlas-map-scroll"
-              tabIndex="0"
-              role="region"
-              aria-label="Mapa ampliable; desplázate para explorar"
-            >
-              <svg
-                className="peru-map"
-                style={{ width: `${zoom * 100}%` }}
-                viewBox="0 0 820 760"
-                aria-label="Selecciona un destino en el mapa del Perú"
-              >
-                <defs>
-                  <pattern
-                    id="map-grid"
-                    width="34"
-                    height="34"
-                    patternUnits="userSpaceOnUse"
-                  >
-                    <path
-                      d="M34 0H0V34"
-                      fill="none"
-                      stroke="#e7e9e6"
-                      strokeWidth=".5"
-                    />
-                  </pattern>
-                </defs>
-                <rect width="820" height="760" fill="url(#map-grid)" />
-                <path
-                  d={outline}
-                  fill="#e9ede6"
-                  stroke="#a6b3a4"
-                  strokeWidth="1.2"
-                />
-                <text x="410" y="265" className="map-country">
-                  PERÚ
-                </text>
-                <text
-                  x="210"
-                  y="590"
-                  className="map-ocean"
-                  transform="rotate(-55 210 590)"
-                >
-                  OCÉANO PACÍFICO
-                </text>
-                <g className="map-north" aria-hidden="true">
-                  <text x="745" y="52" textAnchor="middle">
-                    N
-                  </text>
-                  <path d="M745 63l-6 23 6-5 6 5Z" fill="#263d39" />
-                </g>
-                {ordered.map((d) => {
-                  const west = d.longitude < -76.5;
-                  const side = west ? left : right;
-                  const i = side.indexOf(d);
-                  const [x, y] = project(d.longitude, d.latitude);
-                  const ly = 115 + i * (west ? 58 : 88);
-                  const lx = west ? 170 : 650;
-                  const isSelected = d.destination_id === selected;
-                  const shown = visible.has(d.destination_id);
-                  return (
-                    <g
-                      key={d.destination_id}
-                      onClick={() => {
-                        if (shown) select(d.destination_id);
-                      }}
-                      className={`map-location ${isSelected ? "is-selected" : ""} ${shown ? "" : "is-filtered"}`}
-                    >
-                      <path
-                        className="map-leader"
-                        d={`M${x},${y} L${west ? x - 22 : x + 22},${ly} H${lx}`}
-                        fill="none"
-                      />
-                      <circle
-                        className="map-point-halo"
-                        cx={x}
-                        cy={y}
-                        r={isSelected ? 12 : 6}
-                      />
-                      <circle
-                        className="map-point"
-                        cx={x}
-                        cy={y}
-                        r={isSelected ? 5 : 3}
-                      />
-                      {shown && (
-                        <g
-                          role="button"
-                          tabIndex="0"
-                          aria-label={`Ver ${d.destination}, ${d.region}`}
-                          aria-pressed={isSelected}
-                          onClick={() => select(d.destination_id)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              e.preventDefault();
-                              select(d.destination_id);
-                            }
-                          }}
-                          className="map-label"
-                        >
-                          <rect
-                            x={west ? 12 : 650}
-                            y={ly - 23}
-                            width="158"
-                            height="45"
-                            rx="5"
-                          />
-                          <text
-                            x={west ? 158 : 662}
-                            y={ly - 2}
-                            textAnchor={west ? "end" : "start"}
-                          >
-                            {names[d.destination_id]}
-                          </text>
-                          <text
-                            className="map-region"
-                            x={west ? 158 : 662}
-                            y={ly + 13}
-                            textAnchor={west ? "end" : "start"}
-                          >
-                            {d.region}
-                          </text>
-                        </g>
-                      )}
-                    </g>
-                  );
-                })}
-              </svg>
-            </div>
-            <div className="atlas-map-bottom">
-              <span>
-                <i /> Destino seleccionado
-              </span>
-              <span>Las líneas señalan ubicaciones; no son rutas.</span>
-            </div>
-            <p className="map-credit">
-              Mapa de referencia ·{" "}
-              <a
-                href="https://www.naturalearthdata.com/about/terms-of-use/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Natural Earth
-              </a>
-              . Ubicaciones del catálogo PROXVEL.
-            </p>
-          </section>
-          <aside
-            className="atlas-detail"
-            aria-labelledby="detail-title"
-            hidden={!filtered.length}
-          >
-            <DestinationPhoto key={selected} destination={destination} />
-            <div className="atlas-detail-body">
-              <span className="eyebrow">
-                {destination.region} / {destination.city}
-              </span>
-              <h2 id="detail-title" aria-live="polite">
-                {destination.destination}
-              </h2>
-              <p className="atlas-coordinates">
-                {coord(destination.latitude, "S", "N")} &nbsp; / &nbsp;{" "}
-                {coord(destination.longitude, "O", "E")}
-              </p>
-              <dl>
-                <div>
-                  <dt>Experiencia</dt>
-                  <dd>{destination.category}</dd>
-                </div>
-                <div>
-                  <dt>Costo orientativo</dt>
-                  <dd>{destination.cost_level || "No disponible"}</dd>
-                </div>
-              </dl>
-              <p className="atlas-detail-note">
-                Explora este destino en PROXVEL y descubre cómo encaja con tus
-                preferencias. El nivel de costo es una referencia, no un precio
-                de entrada.
-              </p>
-              <a className="button button-dark" href={apk}>
-                Descargar PROXVEL <span aria-hidden="true">↗</span>
-              </a>
-              <a
-                className="atlas-maps-link"
-                href={`https://www.google.com/maps/search/?api=1&query=${destination.latitude},${destination.longitude}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Abrir ubicación en Google Maps ↗
-              </a>
-            </div>
-          </aside>
-        </div>
-        <section className="atlas-directory" aria-labelledby="directory-title">
-          <div className="atlas-directory-heading">
-            <h2 id="directory-title">Cada punto, una posibilidad.</h2>
-            <p>También puedes elegir un destino desde esta lista.</p>
-          </div>
-          {filtered.length === 0 ? (
-            <div className="atlas-empty">
-              <h3>No encontramos destinos con esos filtros.</h3>
+          <p className="atlas-result-count" aria-live="polite">
+            {filtered.length} lugares para explorar
+          </p>
+          <div className="atlas-place-list">
+            {filtered.map((d) => (
               <button
-                className="button button-outline"
-                onClick={() => {
-                  setQuery("");
-                  setCategory("Todos");
-                }}
+                key={d.destination_id}
+                onClick={() => select(d.destination_id)}
               >
-                Ver todos los destinos
+                <Photo src={d.pin} loading="lazy" />
+                <span>
+                  {d.name}
+                  <small>{d.region}</small>
+                </span>
+                <span aria-hidden="true">↗</span>
               </button>
-            </div>
-          ) : (
-            <div className="atlas-directory-grid">
-              {filtered.map((d) => (
+            ))}
+            {!filtered.length && (
+              <div className="atlas-empty">
+                <p>No encontramos destinos con esos filtros.</p>
                 <button
-                  key={d.destination_id}
-                  className={selected === d.destination_id ? "is-selected" : ""}
-                  aria-pressed={selected === d.destination_id}
                   onClick={() => {
-                    select(d.destination_id);
-                    document.querySelector(".atlas-detail").scrollIntoView({
-                      behavior: window.matchMedia(
-                        "(prefers-reduced-motion: reduce)",
-                      ).matches
-                        ? "instant"
-                        : "smooth",
-                      block: "start",
-                    });
+                    setQuery("");
+                    setCategory("Todos");
                   }}
                 >
-                  <span>{String(catalog.indexOf(d) + 1).padStart(2, "0")}</span>
-                  <div>
-                    <strong>{d.destination}</strong>
-                    <small>
-                      {d.region} · {d.category}
-                    </small>
-                  </div>
-                  <span aria-hidden="true">↗</span>
+                  Ver todos los destinos
                 </button>
-              ))}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </section>
-        <div className="atlas-footnote">
-          <p>
-            Catálogo consultado el 25 de octubre de 2026. Comprueba horarios,
-            accesos y condiciones actuales con fuentes oficiales antes de
-            viajar.
-          </p>
-          <a href="/#descargar">Llévate el Perú en PROXVEL ↗</a>
-        </div>
+        <section className="atlas-cartography" aria-label="Explorar el mapa">
+          <PeruMap
+            items={filtered}
+            view={view}
+            setView={setView}
+            onSelect={select}
+          />
+          <div className="atlas-map-caption">
+            <span>Rueda para acercar · Arrastra para explorar</span>
+            <small>Los pines con número reúnen destinos cercanos.</small>
+          </div>
+          <a
+            className="atlas-map-credit"
+            href="https://www.naturalearthdata.com/about/terms-of-use/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Cartografía: Natural Earth · Catálogo PROXVEL
+          </a>
+        </section>
       </main>
-    </>
+      {!selected && <EcosystemFooter />}
+      {selected && (
+        <Cinema
+          key={selected}
+          destination={destinations.find((d) => d.destination_id === selected)}
+          onBack={back}
+        />
+      )}
+    </div>
   );
 }

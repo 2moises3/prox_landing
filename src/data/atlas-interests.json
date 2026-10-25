@@ -1,0 +1,72 @@
+[
+  {
+    "destination_id": "ollantaytambo",
+    "intereses": "cultura, historia, aventura",
+    "tipo_experiencia": "arqueológico-cultural"
+  },
+  {
+    "destination_id": "catarata_ahuashiyacu",
+    "intereses": "naturaleza, aventura, relax",
+    "tipo_experiencia": "natural-aventura"
+  },
+  {
+    "destination_id": "chan_chan",
+    "intereses": "cultura, historia, académico",
+    "tipo_experiencia": "arqueológico-cultural"
+  },
+  {
+    "destination_id": "ciudadela_kuelap",
+    "intereses": "cultura, naturaleza, aventura",
+    "tipo_experiencia": "arqueológico-natural"
+  },
+  {
+    "destination_id": "huaca_luna",
+    "intereses": "cultura, historia, académico",
+    "tipo_experiencia": "arqueológico-cultural"
+  },
+  {
+    "destination_id": "huaca_pucllana",
+    "intereses": "cultura, urbano, gastronomía",
+    "tipo_experiencia": "arqueológico-urbano"
+  },
+  {
+    "destination_id": "lineas_nazca",
+    "intereses": "cultura, aventura, fotografía",
+    "tipo_experiencia": "arqueológico-cultural"
+  },
+  {
+    "destination_id": "machu_picchu",
+    "intereses": "cultura, naturaleza, aventura, académico",
+    "tipo_experiencia": "arqueológico-cultural-natural"
+  },
+  {
+    "destination_id": "museo_sipan",
+    "intereses": "cultura, académico, familiar",
+    "tipo_experiencia": "cultural-museístico"
+  },
+  {
+    "destination_id": "parque_aguas",
+    "intereses": "urbano, familiar, relax",
+    "tipo_experiencia": "urbano-recreativo"
+  },
+  {
+    "destination_id": "parque_huascaran",
+    "intereses": "naturaleza, aventura, montañismo",
+    "tipo_experiencia": "natural-aventura"
+  },
+  {
+    "destination_id": "reserva_paracas",
+    "intereses": "naturaleza, playa, aventura, relax",
+    "tipo_experiencia": "natural-playa"
+  },
+  {
+    "destination_id": "valle_colca",
+    "intereses": "naturaleza, rural, aventura, relax",
+    "tipo_experiencia": "natural-rural"
+  },
+  {
+    "destination_id": "ventanillas_otuzco",
+    "intereses": "cultura, historia, fotografía",
+    "tipo_experiencia": "arqueológico-cultural"
+  }
+]
