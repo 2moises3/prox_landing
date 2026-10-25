@@ -8,8 +8,6 @@ export const BRAND = {
   tagline: 'Tu próximo destino, recomendado con inteligencia.',
   // El backend redirige al APK de la versión publicada desde el dashboard.
   betaApkUrl: 'https://proxback-production.up.railway.app/api/v1/releases/latest/download',
-  betaReleaseUrl: 'https://proxback-production.up.railway.app/api/v1/releases/latest?platform=android',
-  legacyApkUrl: '/app-release.apk',
 };
 
 export const NAV = [
