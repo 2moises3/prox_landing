@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import {
   motion,
   useScroll,
@@ -10,6 +10,7 @@ import catalog from "./data/catalog.json";
 import { useApkDownload } from "./hooks/useApkDownload";
 import "./product.css";
 import Hero from "./components/Hero";
+import SiteHeader from "./components/SiteHeader";
 
 const photos = {
   machu_picchu: "machupicchu",
@@ -133,27 +134,14 @@ function ProductStage() {
 }
 export default function App() {
   const apkUrl = useApkDownload();
-  const [showAll, setShowAll] = useState(false);
+
   const regions = new Set(catalog.map((d) => d.region)).size;
   return (
     <>
       <a className="skip-link" href="#contenido">
         Saltar al contenido
       </a>
-      <header className="site-header">
-        <a className="wordmark" href="#top" aria-label="PROXVEL, inicio">
-          <img src="/logo.png" alt="" width="32" height="32" />
-          PROXVEL<span className="beta-label">BETA</span>
-        </a>
-        <nav aria-label="Principal">
-          <a href="#app">La app</a>
-          <a href="#destinos">Destinos</a>
-          <a href="#como-funciona">Cómo funciona</a>
-        </nav>
-        <a className="nav-download" href="#descargar">
-          Descargar <Arrow />
-        </a>
-      </header>
+      <SiteHeader home />
       <main id="contenido">
         <Hero />
         <div className="catalog-strip">
@@ -196,11 +184,11 @@ export default function App() {
           <div className="feature-grid">
             {[
               ["◎", "Afinidad", "Tus intereses como punto de partida."],
-              ["☀", "Clima", "El mes del viaje también cuenta."],
-              ["↔", "Afluencia", "El ambiente que prefieres encontrar."],
-              ["◈", "Costo", "Más contexto para planificar."],
-              ["◇", "Seguridad", "Un factor más al comparar destinos."],
-              ["✧", "Limpieza", "Los detalles que suman a la experiencia."],
+              ["☀", "Clima", "Referencia estacional según el mes."],
+              ["↔", "Afluencia", "Referencia mensual, no un aforo en vivo."],
+              ["◈", "Costo", "Nivel orientativo para comparar."],
+              ["◇", "Atención", "Valoraciones sobre atención y servicio."],
+              ["✧", "Atractivos", "Valoraciones de la experiencia turística."],
             ].map(([icon, title, text]) => (
               <article key={title}>
                 <span className="feature-icon" aria-hidden="true">
@@ -229,7 +217,11 @@ export default function App() {
           </div>
           <div className="destination-grid">
             {featured.map((d, i) => (
-              <article className="destination" key={d.destination_id}>
+              <a
+                className="destination"
+                key={d.destination_id}
+                href={`/atlas.html#${d.destination_id}`}
+              >
                 <div className="destination-photo">
                   <img
                     src={`/images/${photos[d.destination_id]}.webp`}
@@ -248,33 +240,15 @@ export default function App() {
                     .replace("Ciudadela de ", "")}
                 </h3>
                 <p>{d.category}</p>
-              </article>
+              </a>
             ))}
           </div>
-          <button
+          <a
             className="button button-outline catalog-toggle"
-            onClick={() => setShowAll(!showAll)}
-            aria-expanded={showAll}
-            aria-controls="full-catalog"
+            href="/atlas.html"
           >
-            {showAll ? "Cerrar catálogo" : `Ver los ${catalog.length} destinos`}{" "}
-            <span aria-hidden="true">{showAll ? "−" : "+"}</span>
-          </button>
-          <div id="full-catalog" hidden={!showAll}>
-            <div className="full-catalog">
-              {catalog.map((d, i) => (
-                <div key={d.destination_id}>
-                  <span>{String(i + 1).padStart(2, "0")}</span>
-                  <div>
-                    <h3>{d.destination}</h3>
-                    <p>
-                      {d.region} · {d.category}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+            Explorar el atlas de los 14 destinos <Arrow />
+          </a>
         </section>
         <section className="how-section" id="como-funciona">
           <span className="eyebrow">DE LA IDEA AL PRÓXIMO DESTINO</span>

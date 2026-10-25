@@ -174,3 +174,99 @@
     padding: 0;
   }
 }
+/* Editorial content and neutral controls echo the product page. */
+.mountain-hero {
+  height: 100svh;
+}
+.mountain-hero__content {
+  bottom: 92px;
+  gap: 14px;
+  max-width: 590px;
+  margin: auto;
+}
+.mountain-hero__content .eyebrow {
+  color: #e1e8ed;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+}
+.mountain-hero__content h2 {
+  font-size: clamp(30px, 3vw, 44px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+.mountain-hero__content p {
+  font-size: 13px;
+  line-height: 1.7;
+  max-width: 420px;
+  color: #dce4ec;
+  text-shadow: none;
+}
+.mountain-hero__actions {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-top: 7px;
+}
+.mountain-hero__cta {
+  background: #fff;
+  color: #18232b;
+  border-color: #fff;
+  font-size: 12px;
+  padding: 14px 25px;
+}
+.mountain-hero__cta:hover {
+  background: #e9eef1;
+}
+.mountain-hero__download {
+  font-size: 12px;
+}
+.mountain-hero__meta {
+  position: absolute;
+  z-index: 4;
+  bottom: 0;
+  left: 5%;
+  right: 5%;
+  height: 55px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #ffffff30;
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  color: #d7e0e8;
+}
+@media (max-width: 600px) {
+  .mountain-hero {
+    height: 100svh;
+    min-height: 700px;
+  }
+  .mountain-hero__content {
+    bottom: 85px;
+    gap: 14px;
+  }
+  .mountain-hero__content h2 {
+    font-size: 32px;
+  }
+  .mountain-hero__content p {
+    font-size: 12px;
+    max-width: 320px;
+  }
+  .mountain-hero__actions {
+    gap: 18px;
+  }
+  .mountain-hero__meta {
+    font-size: 7px;
+  }
+  .mountain-hero__meta > span:nth-child(2) {
+    display: none;
+  }
+}
+@media (max-height: 740px) and (min-width: 601px) {
+  .mountain-hero {
+    min-height: 740px;
+  }
+  .mountain-hero__content h2 {
+    font-size: 32px;
+  }
+}

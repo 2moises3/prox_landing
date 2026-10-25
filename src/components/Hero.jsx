@@ -53,32 +53,31 @@ export default function Hero() {
       </motion.div>
       <div className="mountain-hero__shade" aria-hidden="true" />
       <div className="mountain-hero__content">
+        <span className="eyebrow">UN PAÍS. TU FORMA DE DESCUBRIRLO.</span>
+        <h2>
+          Tu próxima historia
+          <br />
+          empieza con una elección.
+        </h2>
         <p>
-          Descubre el Perú con recomendaciones
-          <br className="desktop-break" /> que conectan con tu forma de viajar.
+          Explora 14 destinos del Perú. En la app, encuentra recomendaciones
+          según tus intereses, el mes de tu viaje y tus preferencias.
         </p>
-        <a href="#destinos" className="button mountain-hero__cta">
-          Explorar destinos <span aria-hidden="true">↗</span>
-        </a>
-        <a href="#descargar" className="mountain-hero__download">
-          Descargar para Android <span aria-hidden="true">↓</span>
-        </a>
+        <div className="mountain-hero__actions">
+          <a href="/atlas.html" className="button mountain-hero__cta">
+            Explorar el atlas <span aria-hidden="true">↗</span>
+          </a>
+          <a href="#app" className="mountain-hero__download">
+            Conoce la app <span aria-hidden="true">↓</span>
+          </a>
+        </div>
       </div>
-      <div
-        className="mountain-hero__strip"
-        aria-label="Factores para elegir tu destino"
-      >
-        {[
-          "Preferencias",
-          "Seguridad",
-          "Costo",
-          "Limpieza",
-          "Clima",
-          "Afluencia",
-          "Afinidad",
-        ].map((f) => (
-          <span key={f}>{f}</span>
-        ))}
+      <div className="mountain-hero__meta">
+        <span>14 DESTINOS · 10 REGIONES</span>
+        <span>HECHO PARA EXPLORAR EL PERÚ</span>
+        <a href="#app" aria-label="Descubrir la app">
+          SIGUE EXPLORANDO ↓
+        </a>
       </div>
     </section>
   );

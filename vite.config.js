@@ -1,16 +1,21 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { resolve } from "path";
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      input: { main: resolve("index.html"), atlas: resolve("atlas.html") },
+    },
+  },
   resolve: {
     alias: {
-      'react': resolve('./node_modules/react'),
-      'react-dom': resolve('./node_modules/react-dom'),
+      react: resolve("./node_modules/react"),
+      "react-dom": resolve("./node_modules/react-dom"),
     },
   },
   optimizeDeps: {
-    include: ['framer-motion'],
+    include: ["framer-motion"],
   },
-})
+});

@@ -1107,3 +1107,43 @@ p {
     height: 420px;
   }
 }
+/* The navigation belongs to the landscape until the hero leaves the viewport. */
+.site-header--overlay {
+  position: fixed;
+  inset: 0 0 auto;
+  transition:
+    background 0.25s,
+    color 0.25s,
+    border-color 0.25s;
+}
+.site-header--clear {
+  background: transparent;
+  backdrop-filter: none;
+  border-color: #ffffff24;
+  color: #fff;
+}
+.site-header--clear .beta-label {
+  color: #fff;
+  border-color: #ffffff60;
+}
+.site-header--clear .nav-download {
+  border-color: #ffffff60;
+  background: #ffffff0a;
+}
+.site-header--clear nav a:hover {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+.site-header--clear .wordmark img {
+  filter: brightness(0) invert(1);
+}
+.site-header nav a[aria-current="page"] {
+  color: #996e30;
+}
+.destination {
+  display: block;
+}
+.catalog-toggle {
+  width: fit-content;
+}
