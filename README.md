@@ -65,12 +65,9 @@ src/
 
 ## Notas sobre el acceso beta
 
-- El **código QR** y el botón "Descargar APK" apuntan a `BRAND.betaApkUrl` en
-  `src/data/content.js`. Actualiza esa constante con tu enlace real del *GitHub Release*
-  cuando publiques el APK.
-- El **formulario de correo** es una simulación de front-end: valida el correo y muestra el
-  estado de éxito ("te enviaremos el enlace"). Conéctalo a tu backend / servicio de correo
-  reemplazando el `setTimeout` en `BetaAccess.jsx`.
+- El **código QR** y los enlaces "Descargar APK" apuntan a `BRAND.betaApkUrl` en
+  `src/data/content.js`. Es una ruta estable del backend que redirige al APK de
+  la última versión Android publicada desde el dashboard; no hay APK en `public/`.
 - "Próximamente en Google Play" se muestra como mensaje, sin enlaces a tienda (aún).
 
 ## Accesibilidad y rendimiento
