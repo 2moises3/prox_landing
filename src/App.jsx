@@ -300,13 +300,15 @@ export default function App() {
           <div className="qr-panel">
             <QRCodeSVG
               value={apkUrl}
-              size={160}
+              size={192}
               marginSize={2}
               level="M"
-              title="Código QR para descargar la última versión de PROXVEL"
+              bgColor="#ffffff"
+              fgColor="#000000"
+              title="Código QR permanente para descargar la última versión de PROXVEL"
             />
             <strong>Escanea. Descarga. Explora.</strong>
-            <span>Apunta la cámara de tu Android.</span>
+            <span>Este QR siempre descarga la versión publicada en el dashboard.</span>
           </div>
         </section>
         <section className="faq-section" id="faq">

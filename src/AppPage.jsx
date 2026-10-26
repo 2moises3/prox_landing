@@ -178,11 +178,14 @@ export default function AppPage() {
           <div className="app-qr">
             <QRCodeSVG
               value={apk}
-              size={150}
+              size={192}
               marginSize={2}
-              title="Descargar PROXVEL para Android"
+              level="M"
+              bgColor="#ffffff"
+              fgColor="#000000"
+              title="Código QR permanente para descargar la última versión de PROXVEL"
             />
-            <span>Escanea con tu Android</span>
+            <span>Escanea con tu Android. Siempre recibirás la versión publicada.</span>
           </div>
         </section>
         <section className="app-trust">

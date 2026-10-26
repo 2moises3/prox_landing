@@ -263,6 +263,9 @@
 .app-qr span {
   font-size: 11px;
   color: #768184;
+  max-width: 220px;
+  text-align: center;
+  line-height: 1.5;
 }
 .app-trust {
   padding: 100px 0;
