@@ -58,19 +58,20 @@ export default function Footer() {
           </div>
 
           <div className="footer__nav">
-            <span className="footer__nav-title">Créditos / Contacto</span>
-            <a href="mailto:alvaro.maguina@upeu.edu.pe">alvaro.maguina@upeu.edu.pe</a>
-            <a href="mailto:moises.morales@upeu.edu.pe">moises.morales@upeu.edu.pe</a>
-            <a href="mailto:erick.mendoza@upeu.edu.pe">erick.mendoza@upeu.edu.pe</a>
+            <span className="footer__nav-title">Contacto</span>
+            <a href="mailto:soporte@m3biznovatech.com">soporte@m3biznovatech.com</a>
+            <span>Ñaña, Lurigancho-Chosica, Lima, Perú</span>
+            <span className="footer__soon">Equipo M3Biznovatech</span>
           </div>
         </div>
 
         <div className="footer__bottom">
-          <span>© {year} PROXVEL. Todos los derechos reservados por Biznovatech.</span>
+          <span>© {year} PROXVEL. Todos los derechos reservados por Biznovatech S.A.C. (M3Biznovatech).</span>
           <div className="footer__legal">
-            <a href="#top">Privacidad</a>
-            <a href="#top">Términos</a>
-            <a href="#beta">Contacto</a>
+            <a href="/privacidad">Privacidad</a>
+            <a href="/terminos">Términos</a>
+            <a href="/mis-datos">Mis datos y eliminación de cuenta</a>
+            <a href="mailto:soporte@m3biznovatech.com">Contacto</a>
           </div>
         </div>
       </div>

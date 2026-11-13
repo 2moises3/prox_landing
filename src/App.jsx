@@ -36,7 +36,7 @@ const featured = featuredIds
 const Arrow = () => <span aria-hidden="true">↗</span>;
 function Phone({ screen, label, className = "" }) {
   return (
-    <div className={`device ${className}`}>
+    <figure className={`device ${className}`} aria-label={label}>
       <div className="device-camera" aria-hidden="true" />
       <img
         src={`/screens/${screen}.webp`}
@@ -46,7 +46,7 @@ function Phone({ screen, label, className = "" }) {
         loading="lazy"
       />
       <div className="device-bar" aria-hidden="true" />
-    </div>
+    </figure>
   );
 }
 function ProductStage() {
@@ -100,10 +100,7 @@ function ProductStage() {
           />
         </motion.div>
       </div>
-      <p className="capture-note">
-        Interfaz de la app, renderizada con Flutter. Las pantallas pueden variar
-        según la versión.
-      </p>
+      <p className="capture-note">Bienvenida · Explorar destinos · Filtros de búsqueda</p>
       <div className="product-points">
         <div>
           <span>01 / EXPLORA</span>
@@ -184,16 +181,16 @@ export default function App() {
           </div>
           <div className="feature-grid">
             {[
-              ["◎", "Afinidad", "Tus intereses como punto de partida."],
-              ["☀", "Clima", "Referencia estacional según el mes."],
-              ["↔", "Afluencia", "Referencia mensual, no un aforo en vivo."],
-              ["◈", "Costo", "Nivel orientativo para comparar."],
-              ["◇", "Atención", "Valoraciones sobre atención y servicio."],
-              ["✧", "Atractivos", "Valoraciones de la experiencia turística."],
+              ["sparkles", "Afinidad", "Tus intereses como punto de partida."],
+              ["thermometer", "Clima", "Referencia estacional según el mes."],
+              ["nav_profile", "Afluencia", "Referencia mensual, no un aforo en vivo."],
+              ["wallet", "Costo", "Nivel orientativo para comparar."],
+              ["info", "Atención", "Valoraciones sobre atención y servicio."],
+              ["mountain", "Atractivos", "Valoraciones de la experiencia turística."],
             ].map(([icon, title, text]) => (
               <article key={title}>
                 <span className="feature-icon" aria-hidden="true">
-                  {icon}
+                  <img src={`/icons/app/${icon}.svg`} alt="" width="22" height="22" />
                 </span>
                 <h3>{title}</h3>
                 <p>{text}</p>

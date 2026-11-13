@@ -1,14 +1,19 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&display=swap");
+@font-face { font-family: Outfit; src: url("/fonts/Outfit-Regular.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: Outfit; src: url("/fonts/Outfit-Medium.ttf") format("truetype"); font-weight: 500; font-display: swap; }
+@font-face { font-family: Outfit; src: url("/fonts/Outfit-SemiBold.ttf") format("truetype"); font-weight: 600; font-display: swap; }
+@font-face { font-family: Outfit; src: url("/fonts/Outfit-Bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
 :root {
-  font-family: "DM Sans", Arial, sans-serif;
-  color: #18232b;
+  font-family: Outfit, Arial, sans-serif;
+  color: #1a1f2e;
   background: #fff;
   font-synthesis: none;
   font-weight: 400;
-  --ink: #18232b;
+  --ink: #1a1f2e;
   --muted: #6e777d;
   --line: #e6e8e9;
-  --gold: #aa7629;
+  --gold: #7c5410;
+  --brand-accent: #fdba00;
+  --discovery: #7756c5;
 }
 * {
   box-sizing: border-box;
@@ -172,12 +177,12 @@ p {
   transform: translateY(-2px);
 }
 .button-dark {
-  background: var(--ink);
-  color: #fff;
-  border: 1px solid var(--ink);
+  background: var(--brand-accent);
+  color: var(--ink);
+  border: 1px solid var(--brand-accent);
 }
 .button-dark:hover {
-  background: #35454f;
+  background: #ffcd4d;
 }
 .text-link {
   font-size: 12px;
@@ -321,6 +326,7 @@ p {
   transform-style: preserve-3d;
 }
 .device {
+  margin: 0;
   position: absolute;
   width: 244px;
   background: #182128;
@@ -1212,3 +1218,6 @@ p {
     gap: 20px;
   }
 }
+
+.feature-icon img { display: block; width: 22px; height: 22px; }
+.feature-icon { background-color: #eee7fb; color: var(--discovery); }
